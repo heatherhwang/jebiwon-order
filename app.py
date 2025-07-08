@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 import openai
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-
-openai.api_key = "OPENAI_API_KEY"
 
 PRICE_TABLE = {
     "전통된장1kg": 20000,
@@ -16,7 +19,7 @@ PRICE_TABLE = {
     "찹쌀고추장5kg": 140000,
     "고추장만들기3.5kg(용기미포함)": 50000,
     "고추장만들기7kg(용기미포함)": 83000,
-    "고추장만들기용기: 5000,
+    "고추장만들기용기": 5000,
     "현미보리고추장만들기7kg": 88000,
     "된장만들기3.5kg": 45000,
     "된장만들기7kg": 70000,
@@ -31,10 +34,14 @@ PRICE_TABLE = {
     "청국장환300g": 24000,
 }
 
+@app.route("/")
+def hello():
+    return "Hello, GPT!"
+
 @app.route("/chat", methods=["POST"])
 def chatbot():
     user_input = request.json.get("userRequest", {}).get("utterance", "")
-    
+
     prompt = f"""다음 문장에서 제품명과 수량을 추출해 제품별 가격을 계산한 뒤 총액을 알려주세요. 
     가격표는 다음과 같습니다. 만약 합계가 30000 이하인 경우 배송비 3000을 추가해서 계산하여 총액을 알려주세요: {PRICE_TABLE}
     문장: "{user_input}" """
@@ -56,4 +63,5 @@ def chatbot():
     return jsonify(response)
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

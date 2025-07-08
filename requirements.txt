@@ -1,4 +1,5 @@
-Flask
+flask
+gunicorn
 openai
 python-dotenv
-gunicorn
+requests
