@@ -3,11 +3,14 @@ import openai
 import os
 from dotenv import load_dotenv
 
+# Flask 객체를 최상단에 선언
+app = Flask(__name__)
+
+# 환경 변수 로드
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-app = Flask(__name__)
-
+# 가격표
 PRICE_TABLE = {
     "전통된장1kg": 20000,
     "전통된장3kg": 53000,
@@ -34,10 +37,12 @@ PRICE_TABLE = {
     "청국장환300g": 24000,
 }
 
+# 기본 라우트
 @app.route("/")
 def hello():
     return "Hello, GPT!"
 
+# 챗봇 주문처리 라우트
 @app.route("/chat", methods=["POST"])
 def chatbot():
     user_input = request.json.get("userRequest", {}).get("utterance", "")
@@ -56,12 +61,15 @@ def chatbot():
         "version": "2.0",
         "template": {
             "outputs": [{
-                "simpleText": {"text": result + "\n\n입금계좌: 농협 351-0194-2025-33 (예금주: 안동제비원전통식품)"}
+                "simpleText": {
+                    "text": result + "\n\n입금계좌: 농협 351-0194-2025-33 (예금주: 안동제비원전통식품)"
+                }
             }]
         }
     }
     return jsonify(response)
 
+# 포트 설정 (Render 등 호환)
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
