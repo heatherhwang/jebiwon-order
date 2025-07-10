@@ -1,0 +1,5 @@
+flask
+gunicorn>=20.0.4
+openai
+python-dotenv
+requests
